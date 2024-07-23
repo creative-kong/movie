@@ -1,0 +1,80 @@
+﻿@{
+    ViewData["Title"] = "Config";
+}
+
+<div class="w-[80%] mx-auto">
+    <div class="flex w-full flex-col">
+        <h1 class="text-xl font-normal text-white">Config Banner</h1>
+        <div class="mt-6 flex w-full justify-end">
+            <button class="flex items-center gap-2 rounded-md bg-gray-200 px-3 py-2" id="add_banner">
+                <span class="material-symbols-outlined text-gray-800">
+                    add_circle
+                </span>
+                Add Banner
+            </button>
+        </div>
+        <table id="config_banner" class="mt-6 w-full">
+            <thead class="rounded-md border border-white">
+                <tr class="text-gray-200">
+                    <th class="w-[10%] border border-r-gray-200 font-normal">No.</th>
+                    <th class="w-[35%] border border-r-gray-200 font-normal">Banner Image</th>
+                    <th class="w-[25%] border border-r-gray-200 font-normal">Is Active</th>
+                    <th class="w-[25%] font-normal">Config</th>
+                </tr>
+            </thead>
+            <tbody id="banner_table_body">
+                <tr>
+                    <th>1</th>
+                    <th>2</th>
+                    <th>3</th>
+                    <th>4</th>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!--Banner Model-->
+<div class="fixed left-0 top-0 flex hidden h-full w-full items-center justify-center bg-opacity-50" id="show_modal_banner">
+    <div class="w-[40%] relative flex flex-col rounded-md bg-white px-8 pb-8 pt-14 shadow-md">
+        <span class="material-symbols-outlined absolute right-5 top-5 cursor-pointer text-gray-800" id="close_banner_modal">
+            close
+        </span>
+        <form class="flex flex-col">
+            <div class="border-2 relative w-full rounded-lg border-dashed border-gray-300 p-6" id="dropzone">
+                <input type="file" class="opacity-0 absolute inset-0 z-50 h-full w-full" />
+                <div class="text-center">
+                    <img class="mx-auto h-12 w-12" src="https://www.svgrepo.com/show/357902/image-upload.svg" alt="">
+
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">
+                        <label for="file-upload" class="relative cursor-pointer">
+                            <span>Drag and drop</span>
+                            <span class="text-indigo-600"> or browse</span>
+                            <span>to upload</span>
+                            <input id="file-upload" name="file_upload" type="file" class="sr-only">
+                        </label>
+                    </h3>
+                    <p class="mt-1 text-xs text-gray-500">
+                        PNG, JPG, GIF up to 10MB
+                    </p>
+                    <img src="" class="mx-auto mt-4 hidden max-h-40" id="preview">
+                </div>
+            </div>
+            <div class="my-4">
+                <select class="w-full rounded-md border border-gray-300 px-2 py-2 focus:outline-none active:outline-none">
+                    <option>select is active image</option>
+                    <option value="true">active</option>
+                    <option value="false">inactive</option>
+                </select>
+            </div>
+            <div class="flex justify-end gap-4">
+                <button type="reset" class="w-[200px] rounded-md bg-gray-800 px-2 py-2 text-white">Cancle</button>
+                <button type="submit" class="w-[200px] rounded-md bg-gray-800 px-2 py-2 text-white">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="/js/config.js"></script>
+}

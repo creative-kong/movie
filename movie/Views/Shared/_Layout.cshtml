@@ -1,0 +1,35 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - movie</title>
+    <link href="/css//site.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+</head>
+<body class="bg-gray-800">
+    <header>
+        <nav class="w-full">
+            <ul class="flex w-full flex-row items-center justify-center gap-6 py-5">
+                <li class="text-xl text-white">
+                    <a asp-area="" asp-controller="Home" asp-action="Index">Movie</a>
+                </li>
+                <li class="text-xl text-white">
+                    <a asp-area="" asp-controller="Home" asp-action="Index">Booking</a>
+                </li>
+                <li class="text-xl text-white">
+                    <a asp-area="" asp-controller="Home" asp-action="Config">Config Movie</a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+    <main role="main" class="w-full">
+        @RenderBody()
+    </main>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
