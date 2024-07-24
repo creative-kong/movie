@@ -10,6 +10,33 @@ namespace movie.Services.CommandService
         {
             connectionString = configuration.GetConnectionString("DefaultConnection");
         }
+
+        public async Task<DataTable> SqlExecute(string sql, SqlParameter[]? parameters)
+        {
+            DataTable dt = new DataTable();
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    SqlDataAdapter da = new SqlDataAdapter(sql, connection);
+                    if (parameters != null && parameters.Length > 0)
+                    {
+                        da.SelectCommand.Parameters.AddRange(parameters);
+                    }
+                    da.Fill(dt);
+                    if (connection.State == ConnectionState.Open)
+                    {
+                        await connection.CloseAsync();
+                    }
+                    return dt;
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public async Task<DataTable> StoredExecute(string storedName, SqlParameter[]? parameters)
         {
             DataTable dt = new DataTable();

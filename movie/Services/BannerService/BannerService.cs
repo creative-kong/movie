@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using movie.Models;
 using movie.Services.CommandService;
+using Newtonsoft.Json;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -50,6 +51,80 @@ namespace movie.Services.BannerService
             {
                 throw;
             }
+        }
+
+        public async Task<ResponseModel<List<Banner>>> getAllBanner()
+        {
+            ResponseModel<List<Banner>> response = new ResponseModel<List<Banner>>();
+            try
+            {
+                const string sql = "SELECT * FROM banner";
+                DataTable dt = await _cmd.SqlExecute(sql, null);
+                if (dt.Rows.Count > 0)
+                {
+                    List<Banner>? result = JsonConvert.DeserializeObject<List<Banner>>(JsonConvert.SerializeObject(dt));
+                    response = new ResponseModel<List<Banner>>()
+                    {
+                        success = true,
+                        data = result,
+                        message = "successfully"
+                    };
+                }
+                else
+                {
+                    response = new ResponseModel<List<Banner>>()
+                    {
+                        success = false,
+                        data = new List<Banner>(),
+                        message = "banner not found"
+                    };
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            return response;
+        }
+
+        public async Task<ResponseModel<Banner>> getBanner(int id)
+        {
+            ResponseModel<Banner> response = new ResponseModel<Banner>();
+            try
+            {
+                const string sql = "SELECT * FROM banner WHERE bannerId = @bannerId";
+                SqlParameter[] parameters = new SqlParameter[]
+                {
+                    new SqlParameter () { ParameterName = "@bannerId", SqlDbType = SqlDbType.Int, Value = id }
+                };
+                DataTable dt = await _cmd.SqlExecute(sql, parameters);
+                if (dt.Rows.Count > 0)
+                {
+                    List<Banner>? result = JsonConvert.DeserializeObject<List<Banner>>(JsonConvert.SerializeObject(dt));
+                    response = new ResponseModel<Banner>()
+                    {
+                        success = true,
+                        data = result.FirstOrDefault(),
+                        message = "successfully"
+                    };
+                }
+                else
+                {
+                    response = new ResponseModel<Banner>()
+                    {
+                        success = false,
+                        data = new Banner(),
+                        message = $"banner id {id} not found"
+                    };
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            return response;
         }
     }
 }

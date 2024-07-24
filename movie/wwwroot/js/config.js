@@ -7,10 +7,16 @@ const banner_submit_btn = document.getElementById('banner_submit_btn')
 const preview = document.getElementById('preview')
 const cancle_banner_btn = document.getElementById('cancle_banner_btn')
 const select_banner_option = document.getElementById('select_banner_option')
+const message_banner = document.getElementById('message_banner')
+const banner_form = document.getElementById('banner_form')
+const banner_table_body = document.getElementById('banner_table_body')
+
+loadBanner()
 
 let banner_type = 'create'
 
 add_banner.addEventListener('click', function () {
+    banner_type = 'create'
     show_modal_banner.classList.remove('hidden')
     show_modal_banner.classList.add('opacity-1')
 })
@@ -52,6 +58,7 @@ banner_submit_btn.addEventListener('click', function (e) {
     console.log(preview.src)
     console.log(Boolean(select_banner_option.value))
     configBanner()
+    message_banner.classList.add('hidden')
 })
 
 async function uploadFile(file) {
@@ -89,13 +96,163 @@ async function configBanner() {
                 },
                 body: JSON.stringify(banner)
             })
+            if (!response.ok) {
+                throw new Error()
+            }
             console.log(response)
             const result = await response.json()
             console.log(result)
+            if (result.success) {
+                messageBannerModalSuccess(result.message)
+            } else {
+                messageBannerModalWarning(result.message)
+            }
         } catch (err) {
             console.log(err)
+            messageBannerModalError('error to create banner')
         }
     } else {
 
     }
+}
+
+async function loadBanner() {
+    try {
+        const request = new Request('/banner')
+        const response = await fetch(request, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type' : 'application/json'
+            }
+        })
+        if (!response.ok) {
+            console.log('error')
+        }
+        const result = await response.json()
+        if (result.success) {
+            createBannerTable(result.data)
+        }
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+async function loadBannerById(id) {
+    try {
+        const request = new Request(`/banner/${id}`)
+        const response = await fetch(request, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+        if (!response.ok) {
+            throw new Error()
+        }
+        const result = await response.json()
+        console.log(result)
+        if (result.success) {
+            appendBannerEdit(result.data)
+        }
+    } catch (err) {
+        messageBannerModalError(`can't load banner with id : ${id}`)
+    }
+}
+
+function appendBannerEdit(data) {
+    preview.src = data.bannerUrl
+    preview.classList.remove('hidden')
+    select_banner_option.value = data.isActive
+}
+
+function createBannerTable(data) {
+    data.forEach(d => {
+        trTag = document.createElement('tr')
+        thTag1 = document.createElement('th')
+        thTag2 = document.createElement('th')
+        thTag3 = document.createElement('th')
+        thTag4 = document.createElement('th')
+        imgTag = document.createElement('img')
+        editBtn = document.createElement('button')
+        deleteBtn = document.createElement('button')
+
+        thTag1.textContent = d.bannerId
+        thTag1.className = 'text-white border border-gray-200'
+        imgTag.src = d.bannerUrl
+        imgTag.className = 'w-[80%]'
+        thTag2.append(imgTag)
+        thTag2.className = 'text-white border border-gray-200'
+        thTag3.textContent = d.isActive
+        thTag3.className = 'text-white border border-gray-200'
+        thTag4.className = 'text-white border border-gray-200 gap-2'
+        editBtn.textContent = 'Edit'
+        editBtn.className = 'bg-white py-2 px-1 rounded-md text-gray-800 mx-2 font-normal'
+        editBtn.addEventListener('click', editBanner.bind(null, d.bannerId))
+        deleteBtn.textContent = 'Delete'
+        deleteBtn.className = 'bg-white py-2 px-1 rounded-md text-gray-800 mx-2 font-normal'
+        thTag4.append(editBtn)
+        thTag4.append(deleteBtn)
+        trTag.append(thTag1)
+        trTag.append(thTag2)
+        trTag.append(thTag3)
+        trTag.append(thTag4)
+        banner_table_body.append(trTag)
+    })
+}
+
+function editBanner(id) {
+    console.log(id)
+    show_modal_banner.classList.remove('hidden')
+    show_modal_banner.classList.add('opacity-1')
+    banner_type = "update"
+    message_banner.classList.add('hidden')
+    loadBannerById(id)
+}
+
+function messageBannerModalError(message) {
+    message_banner.textContent = ''
+    message_banner.classList.remove('hidden')
+    message_banner.classList.add('bg-red-400', 'px-2', 'py-3', 'rounded-md', 'my-4')
+    const spanIcon = document.createElement('span')
+    const pTag = document.createElement('p')
+    spanIcon.className = "material-symbols-outlined text-gray-800"
+    spanIcon.textContent = "error"
+    pTag.textContent = message
+    pTag.className = "font-normal"
+    message_banner.append(spanIcon)
+    message_banner.append(pTag)
+}
+
+function messageBannerModalSuccess(message) {
+    message_banner.textContent = ''
+    message_banner.classList.add('bg-green-400', 'px-2', 'py-3', 'rounded-md', 'my-4')
+    const spanIcon = document.createElement('span')
+    const pTag = document.createElement('p')
+    spanIcon.className = "material-symbols-outlined text-gray-800"
+    spanIcon.textContent = "check"
+    pTag.textContent = message
+    pTag.className = "font-normal"
+    message_banner.append(spanIcon)
+    message_banner.append(pTag)
+    banner_form.reset()
+    setTimeout(() => {
+        show_modal_banner.classList.add('hidden')
+        show_modal_banner.classList.remove('opacity-1')
+    }, 2000)
+    loadBanner()
+}
+
+function messageBannerModalWarning(message) {
+    message_banner.textContent = ''
+    message_banner.classList.add('bg-yellow-400', 'px-2', 'py-3', 'rounded-md', 'my-4')
+    const spanIcon = document.createElement('span')
+    const pTag = document.createElement('p')
+    spanIcon.className = "material-symbols-outlined text-gray-800"
+    spanIcon.textContent = "warning"
+    pTag.textContent = message
+    pTag.className = "font-normal"
+    message_banner.append(spanIcon)
+    message_banner.append(pTag)
 }
