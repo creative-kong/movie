@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using movie.Models;
+using movie.Services.BannerService;
 using System.Diagnostics;
 
 namespace movie.Controllers

@@ -1,10 +1,14 @@
 using Microsoft.Extensions.FileProviders;
+using movie.Services.BannerService;
+using movie.Services.CommandService;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
+builder.Services.AddTransient<ICommandService, CommandService>();
+builder.Services.AddTransient<IBannerService, BannerService>();
 
 var app = builder.Build();
 

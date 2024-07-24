@@ -77,14 +77,14 @@
                         <label for="file_upload" class="relative cursor-pointer">
                             <span class="text-indigo-600">browse</span>
                             <span>to upload</span>
-                            <input id="file_upload" name="file_upload" type="file" class="sr-only">
+                            <input id="file_upload" name="file_upload" type="file" class="sr-only" required>
                         </label>
                     </h3>
                     <img src="" class="mx-auto mt-4 hidden max-h-40" id="preview">
                 </div>
             </div>
             <div class="my-4">
-                <select class="w-full rounded-md border border-gray-300 px-2 py-2 focus:outline-none active:outline-none">
+                <select class="w-full rounded-md border border-gray-300 px-2 py-2 focus:outline-none active:outline-none" id="select_banner_option" required>
                     <option>select is active image</option>
                     <option value="true">active</option>
                     <option value="false">inactive</option>
