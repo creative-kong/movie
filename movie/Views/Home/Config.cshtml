@@ -31,6 +31,35 @@
                 </tr>
             </tbody>
         </table>
+        <h1 class="mt-12 text-xl font-normal text-white">Config Movie</h1>
+        <div class="mt-6 flex w-full justify-end">
+            <button class="flex items-center gap-2 rounded-md bg-gray-200 px-3 py-2" id="add_movie">
+                <span class="material-symbols-outlined text-gray-800">
+                    add_circle
+                </span>
+                Add Movie
+            </button>
+        </div>
+        <table id="config_banner" class="mt-6 w-full">
+            <thead class="rounded-md border border-white">
+                <tr class="text-gray-200">
+                    <th class="w-[20%] border border-r-gray-200 font-normal">Title</th>
+                    <th class="w-[20%] border border-r-gray-200 font-normal">Released</th>
+                    <th class="w-[20%] border border-r-gray-200 font-normal">Duration</th>
+                    <th class="w-[20%] border border-r-gray-200 font-normal">Genres</th>
+                    <th class="w-[20%] font-normal">Config</th>
+                </tr>
+            </thead>
+            <tbody id="banner_table_body">
+                <tr>
+                    <th>1</th>
+                    <th>2</th>
+                    <th>3</th>
+                    <th>4</th>
+                    <th>5</th>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </div>
 
@@ -44,14 +73,13 @@
             <div class="border-2 relative w-full rounded-lg border-dashed border-gray-300 p-6" id="dropzone">
                 <input type="file" class="opacity-0 absolute inset-0 z-50 h-full w-full" />
                 <div class="text-center">
-                    <img class="mx-auto h-12 w-12" src="https://www.svgrepo.com/show/357902/image-upload.svg" alt="">
+                    <img class="mx-auto h-12 w-12" src="https://www.svgrepo.com/show/357902/image-upload.svg" alt="logo image">
 
                     <h3 class="mt-2 text-sm font-medium text-gray-900">
-                        <label for="file-upload" class="relative cursor-pointer">
-                            <span>Drag and drop</span>
-                            <span class="text-indigo-600"> or browse</span>
+                        <label for="file_upload" class="relative cursor-pointer">
+                            <span class="text-indigo-600">browse</span>
                             <span>to upload</span>
-                            <input id="file-upload" name="file_upload" type="file" class="sr-only">
+                            <input type="file" class="sr-only" id="file_upload" name="file_upload" multiple />
                         </label>
                     </h3>
                     <p class="mt-1 text-xs text-gray-500">
@@ -69,7 +97,7 @@
             </div>
             <div class="flex justify-end gap-4">
                 <button type="reset" class="w-[200px] rounded-md bg-gray-800 px-2 py-2 text-white">Cancle</button>
-                <button type="submit" class="w-[200px] rounded-md bg-gray-800 px-2 py-2 text-white">Save</button>
+                <button type="submit" class="w-[200px] rounded-md bg-gray-800 px-2 py-2 text-white" id="banner_submit">Save</button>
             </div>
         </form>
     </div>
