@@ -53,6 +53,44 @@ namespace movie.Services.BannerService
             }
         }
 
+        public async Task<ResponseModel<Banner>> deleteBanner(int id)
+        {
+            ResponseModel<Banner> response = new ResponseModel<Banner>();
+            try
+            {
+                const string sql = "DELETE FROM banner WHERE bannerId = @bannerId";
+                SqlParameter[] parameters = new SqlParameter[]
+                {
+                    new SqlParameter () { ParameterName = "@bannerId", SqlDbType = SqlDbType.Int, Value = id }
+                };
+                int i = await _cmd.SqlExecuteNoneQuery(sql, parameters);
+                if (i > 0)
+                {
+                    response = new ResponseModel<Banner>()
+                    {
+                        success = true,
+                        data = new Banner (),
+                        message = "successfully"
+                    };
+                }
+                else
+                {
+                    response = new ResponseModel<Banner>()
+                    {
+                        success = false,
+                        data = new Banner (),
+                        message = "banner not found"
+                    };
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            return response;
+        }
+
         public async Task<ResponseModel<List<Banner>>> getAllBanner()
         {
             ResponseModel<List<Banner>> response = new ResponseModel<List<Banner>>();
@@ -125,6 +163,45 @@ namespace movie.Services.BannerService
             }
 
             return response;
+        }
+
+        public async Task<ResponseModel<Banner>> updateBanner(int id, Banner model)
+        {
+            ResponseModel<Banner> response = new ResponseModel<Banner>();
+            try
+            {
+                const string storedName = "manage_banner";
+                SqlParameter[] parameters = new SqlParameter[]
+                {
+                    new SqlParameter () { ParameterName = "@bannerId", SqlDbType = SqlDbType.Int, Value = id },
+                    new SqlParameter () { ParameterName = "@bannerUrl", SqlDbType = SqlDbType.NVarChar, Value = model.bannerUrl },
+                    new SqlParameter () { ParameterName = "@isActive", SqlDbType = SqlDbType.Bit, Value = model.isActive }
+                };
+                DataTable dt = await _cmd.StoredExecute(storedName, parameters);
+                if (dt.Rows.Count > 0 && dt.Rows[0]["V_COLUMN"].ToString() != "-1")
+                {
+                    response = new ResponseModel<Banner>()
+                    {
+                        success = true,
+                        data = new Banner(),
+                        message = "update banner successfully"
+                    };
+                }
+                else
+                {
+                    response = new ResponseModel<Banner>()
+                    {
+                        success = false,
+                        data = new Banner(),
+                        message = "can't update banner"
+                    };
+                }
+                return response;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }

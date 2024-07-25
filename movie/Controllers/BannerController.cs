@@ -76,5 +76,48 @@ namespace movie.Controllers
             }
             return response;
         }
+
+
+        [HttpPut("/banner/{id}")]
+        public async Task<IActionResult> updateBanner(int id, [FromBody] Banner model)
+        {
+            var response = StatusCode(StatusCodes.Status200OK, new object());
+            try
+            {
+                ResponseModel<Banner> result = await _banner.updateBanner(id, model);
+                response = StatusCode(StatusCodes.Status200OK, result);
+            }
+            catch (Exception ex)
+            {
+                response = StatusCode(StatusCodes.Status500InternalServerError, new ResponseModel<object>()
+                {
+                    success = false,
+                    data = new object(),
+                    message = ex.Message
+                });
+            }
+            return response;
+        }
+
+        [HttpDelete("/banner/{id}")]
+        public async Task<IActionResult> deleteBanner(int id)
+        {
+            var response = StatusCode(StatusCodes.Status200OK, new object());
+            try
+            {
+                ResponseModel<Banner> result = await _banner.deleteBanner(id);
+                response = StatusCode(StatusCodes.Status200OK, result);
+            }
+            catch (Exception ex)
+            {
+                response = StatusCode(StatusCodes.Status500InternalServerError, new ResponseModel<object>()
+                {
+                    success = false,
+                    data = new object(),
+                    message = ex.Message
+                });
+            }
+            return response;
+        }
     }
 }

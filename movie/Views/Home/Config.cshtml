@@ -51,13 +51,7 @@
                 </tr>
             </thead>
             <tbody id="banner_table_body">
-                <tr>
-                    <th>1</th>
-                    <th>2</th>
-                    <th>3</th>
-                    <th>4</th>
-                    <th>5</th>
-                </tr>
+                
             </tbody>
         </table>
     </div>
@@ -90,11 +84,28 @@
                     <option value="false">inactive</option>
                 </select>
             </div>
+            <p class="hidden" id="banner_id"></p>
             <div class="flex hidden w-full gap-3" id="message_banner">
             </div>
             <div class="flex w-full gap-4">
                 <button type="reset" class="w-[50%] rounded-md bg-gray-800 px-2 py-2 text-white" id="cancle_banner_btn">Cancle</button>
                 <button type="submit" class="w-[50%] rounded-md bg-gray-800 px-2 py-2 text-white" id="banner_submit_btn">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!--Movie Model-->
+<div class="fixed left-0 top-0 flex hidden h-full w-full items-center justify-center bg-opacity-50" id="show_modal_movie">
+    <div class="w-[50%] relative flex flex-col rounded-md bg-white px-8 pb-8 pt-14 shadow-md">
+        <span class="material-symbols-outlined absolute right-5 top-5 cursor-pointer text-gray-800" id="close_modal_movie">
+            close
+        </span>
+        <form class="flex flex-col" id="movie_form">
+            
+            <div class="flex w-full gap-4">
+                <button type="reset" class="w-[50%] rounded-md bg-gray-800 px-2 py-2 text-white" id="cancle_movie_btn">Cancle</button>
+                <button type="submit" class="w-[50%] rounded-md bg-gray-800 px-2 py-2 text-white" id="movie_submit_btn">Save</button>
             </div>
         </form>
     </div>

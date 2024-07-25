@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Data.SqlClient;
+using System.Security.Cryptography.X509Certificates;
 
 namespace movie.Services.CommandService
 {
@@ -29,6 +30,34 @@ namespace movie.Services.CommandService
                         await connection.CloseAsync();
                     }
                     return dt;
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<int> SqlExecuteNoneQuery(string sql, SqlParameter[]? parameters)
+        {
+            int i = 0;
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    SqlCommand cmd = new SqlCommand(sql, connection);
+                    if (parameters != null && parameters.Length > 0)
+                    {
+                        cmd.Parameters.AddRange(parameters);
+                    }
+                    if (connection.State == ConnectionState.Open)
+                    {
+                        await connection.CloseAsync();
+                    }
+                    await connection.OpenAsync();
+                    i = await cmd.ExecuteNonQueryAsync();
+                    await connection.CloseAsync();
+                    return i;
                 }
             }
             catch (Exception)

@@ -10,10 +10,18 @@ const select_banner_option = document.getElementById('select_banner_option')
 const message_banner = document.getElementById('message_banner')
 const banner_form = document.getElementById('banner_form')
 const banner_table_body = document.getElementById('banner_table_body')
+const banner_id = document.getElementById('banner_id')
+
+//movie
+const add_movie = document.getElementById('add_movie')
+const show_modal_movie = document.getElementById('show_modal_movie')
+const close_modal_movie = document.getElementById('close_modal_movie')
+const cancle_movie_btn = document.getElementById('cancle_movie_btn')
 
 loadBanner()
 
 let banner_type = 'create'
+let movie_type = 'create'
 
 add_banner.addEventListener('click', function () {
     banner_type = 'create'
@@ -21,14 +29,30 @@ add_banner.addEventListener('click', function () {
     show_modal_banner.classList.add('opacity-1')
 })
 
+add_movie.addEventListener('click', function () {
+    movie_type = 'create'
+    show_modal_movie.classList.remove('hidden')
+    show_modal_movie.classList.add('opacity-1')
+})
+
 close_banner_modal.addEventListener('click', function () {
     show_modal_banner.classList.add('hidden')
     show_modal_banner.classList.remove('opacity-1')
 })
 
+close_modal_movie.addEventListener('click', function () {
+    show_modal_movie.classList.add('hidden')
+    show_modal_movie.classList.remove('opacity-1')
+})
+
 cancle_banner_btn.addEventListener('click', function () {
     show_modal_banner.classList.add('hidden')
     show_modal_banner.classList.remove('opacity-1')
+})
+
+cancle_movie_btn.addEventListener('click', function () {
+    show_modal_movie.classList.add('hidden')
+    show_modal_movie.classList.remove('opacity-1')
 })
 
 dropzone.addEventListener('dragover', e => {
@@ -87,7 +111,7 @@ async function configBanner() {
             let banner = {}
             banner.bannerId = 0
             banner.bannerUrl = preview.src
-            banner.isActive = Boolean(select_banner_option.value)
+            banner.isActive = select_banner_option.value.toLowerCase() === 'true'
             const response = await fetch(request, {
                 method: 'POST',
                 headers: {
@@ -112,7 +136,36 @@ async function configBanner() {
             messageBannerModalError('error to create banner')
         }
     } else {
-
+        const bannerId = banner_id.innerHTML
+        try {
+            const request = new Request(`/banner/${bannerId}`)
+            let banner = {}
+            banner.bannerId = bannerId
+            banner.bannerUrl = preview.src
+            banner.isActive = select_banner_option.value.toLowerCase() === 'true'
+            const response = await fetch(request, {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(banner)
+            })
+            if (!response.ok) {
+                throw new Error()
+            }
+            console.log(response)
+            const result = await response.json()
+            console.log(result)
+            if (result.success) {
+                messageBannerModalSuccess(result.message)
+            } else {
+                messageBannerModalWarning(result.message)
+            }
+        } catch (err) {
+            console.log(err)
+            messageBannerModalError('error to create banner')
+        }
     }
 }
 
@@ -130,8 +183,11 @@ async function loadBanner() {
             console.log('error')
         }
         const result = await response.json()
+        console.log(result)
         if (result.success) {
             createBannerTable(result.data)
+        } else {
+            banner_table_body.textContent = ''
         }
     } catch (err) {
         console.log(err)
@@ -154,6 +210,7 @@ async function loadBannerById(id) {
         const result = await response.json()
         console.log(result)
         if (result.success) {
+            console.log('yes')
             appendBannerEdit(result.data)
         }
     } catch (err) {
@@ -161,13 +218,41 @@ async function loadBannerById(id) {
     }
 }
 
+async function deleteBannerById(id) {
+    try {
+        const request = new Request(`/banner/${id}`)
+        const response = await fetch(request, {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+        if (!response.ok) {
+            throw new Error()
+        }
+        const result = await response.json()
+        console.log(result)
+        if (result.success) {
+            console.log('success')
+            loadBanner()
+        }
+    } catch (err) {
+        messageBannerModalError(`can't load banner with id : ${id}`)
+    }
+}
+
 function appendBannerEdit(data) {
+    console.log('click')
+    banner_id.innerHTML = data.bannerId
     preview.src = data.bannerUrl
     preview.classList.remove('hidden')
     select_banner_option.value = data.isActive
 }
 
 function createBannerTable(data) {
+    console.log("datavalue", data)
+    banner_table_body.textContent = ''
     data.forEach(d => {
         trTag = document.createElement('tr')
         thTag1 = document.createElement('th')
@@ -192,6 +277,7 @@ function createBannerTable(data) {
         editBtn.addEventListener('click', editBanner.bind(null, d.bannerId))
         deleteBtn.textContent = 'Delete'
         deleteBtn.className = 'bg-white py-2 px-1 rounded-md text-gray-800 mx-2 font-normal'
+        deleteBtn.addEventListener('click', deleteBanner.bind(null, d.bannerId))
         thTag4.append(editBtn)
         thTag4.append(deleteBtn)
         trTag.append(thTag1)
@@ -200,6 +286,10 @@ function createBannerTable(data) {
         trTag.append(thTag4)
         banner_table_body.append(trTag)
     })
+}
+
+function deleteBanner(id) {
+    deleteBannerById(id)
 }
 
 function editBanner(id) {
@@ -227,6 +317,7 @@ function messageBannerModalError(message) {
 
 function messageBannerModalSuccess(message) {
     message_banner.textContent = ''
+    message_banner.classList.remove('hidden')
     message_banner.classList.add('bg-green-400', 'px-2', 'py-3', 'rounded-md', 'my-4')
     const spanIcon = document.createElement('span')
     const pTag = document.createElement('p')
@@ -246,6 +337,7 @@ function messageBannerModalSuccess(message) {
 
 function messageBannerModalWarning(message) {
     message_banner.textContent = ''
+    message_banner.classList.remove('hidden')
     message_banner.classList.add('bg-yellow-400', 'px-2', 'py-3', 'rounded-md', 'my-4')
     const spanIcon = document.createElement('span')
     const pTag = document.createElement('p')
