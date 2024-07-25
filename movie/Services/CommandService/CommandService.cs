@@ -95,5 +95,27 @@ namespace movie.Services.CommandService
                 throw;
             }
         }
+
+        public async Task<DataTable> StoredExecuteTran(string storedName, SqlConnection connection, SqlTransaction tran, SqlParameter[]? parameters)
+        {
+            DataTable dt = new DataTable();
+            try
+            {
+                SqlCommand cmd = new SqlCommand(storedName, connection);
+                cmd.CommandType = CommandType.StoredProcedure;
+                if (parameters != null && parameters.Length > 0)
+                {
+                    cmd.Parameters.AddRange(parameters);
+                }
+                cmd.Transaction = tran;
+                var reader = await cmd.ExecuteReaderAsync();
+                dt.Load(reader);
+                return dt;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
 }
