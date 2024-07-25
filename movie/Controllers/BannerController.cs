@@ -4,7 +4,7 @@ using movie.Services.BannerService;
 
 namespace movie.Controllers
 {
-    public class BannerController : Controller
+    public class BannerController : ControllerBase
     {
         private readonly IBannerService _banner;
         public BannerController(IBannerService banner) 

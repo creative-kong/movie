@@ -1,6 +1,11 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.FileProviders;
 using movie.Services.BannerService;
+using movie.Services.BannerService.MovieService;
 using movie.Services.CommandService;
+using System.Buffers;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +14,12 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 builder.Services.AddTransient<ICommandService, CommandService>();
 builder.Services.AddTransient<IBannerService, BannerService>();
+builder.Services.AddTransient<IMovieService, MovieService>();
+builder.Services.AddControllers(o =>
+{
+    o.AllowEmptyInputInBodyModelBinding = true;
+});
+
 
 var app = builder.Build();
 

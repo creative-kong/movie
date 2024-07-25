@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Formatters;
+﻿using Microsoft.AspNetCore.Connections;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using movie.Models;
 using movie.Services.CommandService;
 using System.Data;
@@ -15,29 +16,30 @@ namespace movie.Services.BannerService.MovieService
             connectionString = configuration.GetConnectionString("DefaultConnection");
             _cmd = cmd;
         }
-        public async Task<ResponseModel<object>> createMovie(Movie model)
+        public async Task<ResponseModel<object>> createMovie(Movies model)
         {
             ResponseModel<object> response = new ResponseModel<object>();
             DataTable dt = new DataTable();
-            try
-            {
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
                     if (connection.State == ConnectionState.Open)
                     {
                         await connection.CloseAsync();
                     }
+                    await connection.OpenAsync();
                     SqlTransaction tran = connection.BeginTransaction();
+                try
+                {
                     string storedName = "manage_movie";
                     SqlParameter[] parameters = new SqlParameter[]
                     {
-                        new SqlParameter () { ParameterName = "@movieId", SqlDbType = SqlDbType.Int, Value = 0 },
-                        new SqlParameter () { ParameterName = "@poster", SqlDbType = SqlDbType.NVarChar, Value = model.poster },
-                        new SqlParameter () { ParameterName = "@title", SqlDbType = SqlDbType.NVarChar, Value = model.title },
-                        new SqlParameter () { ParameterName = "@year", SqlDbType = SqlDbType.Int, Value = model.year },
-                        new SqlParameter () { ParameterName = "@released", SqlDbType = SqlDbType.DateTime, Value = model.released },
-                        new SqlParameter () { ParameterName = "@runtime", SqlDbType = SqlDbType.Time, Value = model.runtime },
-                        new SqlParameter () { ParameterName = "@genre", SqlDbType = SqlDbType.NVarChar, Value = model.genre }
+                            new SqlParameter () { ParameterName = "@movieId", SqlDbType = SqlDbType.Int, Value = 0 },
+                            new SqlParameter () { ParameterName = "@poster", SqlDbType = SqlDbType.NVarChar, Value = model.poster },
+                            new SqlParameter () { ParameterName = "@title", SqlDbType = SqlDbType.NVarChar, Value = model.title },
+                            new SqlParameter () { ParameterName = "@year", SqlDbType = SqlDbType.Int, Value = model.year },
+                            new SqlParameter () { ParameterName = "@released", SqlDbType = SqlDbType.DateTime, Value = model.released },
+                            new SqlParameter () { ParameterName = "@runtime", SqlDbType = SqlDbType.Time, Value = model.runtime.ToString() },
+                            new SqlParameter () { ParameterName = "@genre", SqlDbType = SqlDbType.NVarChar, Value = model.genre }
                     };
                     dt = await _cmd.StoredExecuteTran(storedName, connection, tran, parameters);
                     if (dt.Rows[0]["V_COLUMN"].ToString() == "-1")
@@ -49,14 +51,14 @@ namespace movie.Services.BannerService.MovieService
                     {
                         int _id = Int32.Parse(dt.Rows[0]["V_COLUMN"].ToString());
 
-                        foreach(ReleaseMovie release in model.releaseMovies)
+                        foreach (ReleaseMovie release in model.releaseMovies)
                         {
                             storedName = "manage_releaseMovie";
                             parameters = new SqlParameter[]
                             {
-                                new SqlParameter () { ParameterName = "@releaseId", SqlDbType = SqlDbType.Int, Value = 0 },
-                                new SqlParameter () { ParameterName = "@movieId", SqlDbType = SqlDbType.Int, Value = _id },
-                                new SqlParameter () { ParameterName = "@date", SqlDbType = SqlDbType.Date, Value = release.date }
+                                    new SqlParameter () { ParameterName = "@releaseId", SqlDbType = SqlDbType.Int, Value = 0 },
+                                    new SqlParameter () { ParameterName = "@movieId", SqlDbType = SqlDbType.Int, Value = _id },
+                                    new SqlParameter () { ParameterName = "@date", SqlDbType = SqlDbType.Date, Value = release.date }
                             };
                             dt = await _cmd.StoredExecuteTran(storedName, connection, tran, parameters);
                             if (dt.Rows[0]["V_COLUMN"].ToString() == "-1")
@@ -67,13 +69,13 @@ namespace movie.Services.BannerService.MovieService
                             else
                             {
                                 int id = Int32.Parse(dt.Rows[0]["V_COLUMN"].ToString());
-                                foreach(ReleaseTime time in release.releaseTimes)
+                                foreach (ReleaseTime time in release.releaseTimes)
                                 {
                                     storedName = "manage_releaseTime";
                                     parameters = new SqlParameter[]
                                     {
-                                        new SqlParameter () { ParameterName = "@releaseId", SqlDbType = SqlDbType.Int, Value = id },
-                                        new SqlParameter () { ParameterName = "@time", SqlDbType = SqlDbType.Time, Value = time.time }
+                                            new SqlParameter () { ParameterName = "@releaseId", SqlDbType = SqlDbType.Int, Value = id },
+                                            new SqlParameter () { ParameterName = "@time", SqlDbType = SqlDbType.Time, Value = time.time.ToString() }
                                     };
                                     dt = await _cmd.StoredExecuteTran(storedName, connection, tran, parameters);
                                     if (dt.Rows[0]["V_COLUMN"].ToString() == "-1")
@@ -85,20 +87,26 @@ namespace movie.Services.BannerService.MovieService
                                 tran.Commit();
                             }
                         }
+
                     }
                     response = new ResponseModel<object>()
                     {
                         success = true,
-                        data = new object (),
+                        data = new object(),
                         message = "successfully"
                     };
                 }
-                return response;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+                catch (Exception)
+                {
+                    tran.Rollback();
+                    throw;
+                }
+                finally
+                {
+                    await connection.CloseAsync();
+                }
+                    return response;
+                }
         }
 
         public async Task<ResponseModel<object>> deleteMovie(int id)
@@ -138,17 +146,17 @@ namespace movie.Services.BannerService.MovieService
             }
         }
 
-        public Task<ResponseModel<List<Movie>>> getAllMovie()
+        public Task<ResponseModel<List<Movies>>> getAllMovie()
         {
             throw new NotImplementedException();
         }
 
-        public Task<ResponseModel<Movie>> getMovie(int id)
+        public Task<ResponseModel<Movies>> getMovie(int id)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<ResponseModel<object>> updateMovie(int id, Movie model)
+        public async Task<ResponseModel<object>> updateMovie(int id, Movies model)
         {
             ResponseModel<object> response = new ResponseModel<object>();
             DataTable dt = new DataTable();
