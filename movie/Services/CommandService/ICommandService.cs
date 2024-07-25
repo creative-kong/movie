@@ -7,6 +7,7 @@ namespace movie.Services.CommandService
     {
         Task<DataTable> SqlExecute(string sql, SqlParameter[]? parameters);
         Task<int> SqlExecuteNoneQuery(string sql, SqlParameter[]? parameters);
+        Task<int> SqlExecuteNoneQueryTran(string sql, SqlConnection connection, SqlTransaction tran, SqlParameter[]? parameters);
         Task<DataTable> StoredExecute(string storedName, SqlParameter[]? parameters);
         Task<DataTable> StoredExecuteTran(string storedName, SqlConnection connection, SqlTransaction tran, SqlParameter[]? parameters);
     }

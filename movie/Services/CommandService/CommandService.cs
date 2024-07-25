@@ -66,6 +66,26 @@ namespace movie.Services.CommandService
             }
         }
 
+        public async Task<int> SqlExecuteNoneQueryTran(string sql, SqlConnection connection, SqlTransaction tran, SqlParameter[]? parameters)
+        {
+            int i;
+            try
+            {
+                SqlCommand cmd = new SqlCommand(sql, connection);
+                if (parameters != null && parameters.Length > 0)
+                {
+                    cmd.Parameters.AddRange(parameters);
+                }
+                cmd.Transaction = tran;
+                i = await cmd.ExecuteNonQueryAsync();
+                return i;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public async Task<DataTable> StoredExecute(string storedName, SqlParameter[]? parameters)
         {
             DataTable dt = new DataTable();
