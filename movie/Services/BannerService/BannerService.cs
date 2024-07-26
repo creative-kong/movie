@@ -165,6 +165,41 @@ namespace movie.Services.BannerService
             return response;
         }
 
+        public async Task<ResponseModel<List<Banner>>> showBanner()
+        {
+            ResponseModel<List<Banner>> response = new ResponseModel<List<Banner>>();
+            try
+            {
+                const string sql = "SELECT * FROM banner WHERE isActive = 1";
+                DataTable dt = await _cmd.SqlExecute(sql, null);
+                if (dt.Rows.Count > 0)
+                {
+                    List<Banner>? result = JsonConvert.DeserializeObject<List<Banner>>(JsonConvert.SerializeObject(dt));
+                    response = new ResponseModel<List<Banner>>()
+                    {
+                        success = true,
+                        data = result,
+                        message = "successfully"
+                    };
+                }
+                else
+                {
+                    response = new ResponseModel<List<Banner>>()
+                    {
+                        success = false,
+                        data = new List<Banner>(),
+                        message = "banner not found"
+                    };
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            return response;
+        }
+
         public async Task<ResponseModel<Banner>> updateBanner(int id, Banner model)
         {
             ResponseModel<Banner> response = new ResponseModel<Banner>();

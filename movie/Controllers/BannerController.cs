@@ -56,6 +56,28 @@ namespace movie.Controllers
             return response;
         }
 
+        [HttpGet("/showbanner")]
+        public async Task<IActionResult> showBanner()
+        {
+            var response = StatusCode(StatusCodes.Status200OK, new object());
+            try
+            {
+                ResponseModel<List<Banner>> result = await _banner.showBanner();
+                response = StatusCode(StatusCodes.Status200OK, result);
+            }
+            catch (Exception ex)
+            {
+                response = StatusCode(StatusCodes.Status500InternalServerError, new ResponseModel<object>()
+                {
+                    success = false,
+                    data = new object(),
+                    message = ex.Message
+                });
+            }
+
+            return response;
+        }
+
         [HttpGet("/banner/{id}")]
         public async Task<IActionResult> getBanner(int id)
         {

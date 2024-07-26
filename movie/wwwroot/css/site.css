@@ -16,10 +16,10 @@ a:active {
 
 @keyframes fade {
     from {
-        opacity: .4
+        opacity: .4; 
     }
 
     to {
-        opacity: 1
+        opacity: 1;
     }
 }
