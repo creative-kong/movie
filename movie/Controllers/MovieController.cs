@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using movie.Models;
-using movie.Services.BannerService.MovieService;
+using movie.Services.MovieService;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 
@@ -36,6 +36,49 @@ namespace movie.Controllers
                 });
             }
 
+            return response;
+        }
+
+        [HttpGet("/movie")]
+        public async Task<IActionResult> getAllBanner()
+        {
+            var response = StatusCode(StatusCodes.Status200OK, new object());
+            try
+            {
+                ResponseModel<List<Movies>> result = await _movie.getAllMovie();
+                response = StatusCode(StatusCodes.Status200OK, result);
+            }
+            catch (Exception ex)
+            {
+                response = StatusCode(StatusCodes.Status500InternalServerError, new ResponseModel<object>()
+                {
+                    success = false,
+                    data = new object(),
+                    message = ex.Message
+                });
+            }
+
+            return response;
+        }
+
+        [HttpDelete("/movie/{id}")]
+        public async Task<IActionResult> deleteBanner(int id)
+        {
+            var response = StatusCode(StatusCodes.Status200OK, new object());
+            try
+            {
+                ResponseModel<object> result = await _movie.deleteMovie(id);
+                response = StatusCode(StatusCodes.Status200OK, result);
+            }
+            catch (Exception ex)
+            {
+                response = StatusCode(StatusCodes.Status500InternalServerError, new ResponseModel<object>()
+                {
+                    success = false,
+                    data = new object(),
+                    message = ex.Message
+                });
+            }
             return response;
         }
     }

@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.FileProviders;
 using movie.Services.BannerService;
-using movie.Services.BannerService.MovieService;
 using movie.Services.CommandService;
+using movie.Services.MovieService;
 using System.Buffers;
 using System.Text.Json;
 

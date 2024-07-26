@@ -2,16 +2,17 @@
 using Microsoft.AspNetCore.Mvc.Formatters;
 using movie.Models;
 using movie.Services.CommandService;
+using Newtonsoft.Json;
 using System.Data;
 using System.Data.SqlClient;
 
-namespace movie.Services.BannerService.MovieService
+namespace movie.Services.MovieService
 {
     public class MovieService : IMovieService
     {
         private string? connectionString = string.Empty;
         private readonly ICommandService _cmd;
-        public MovieService(IConfiguration configuration, ICommandService cmd) 
+        public MovieService(IConfiguration configuration, ICommandService cmd)
         {
             connectionString = configuration.GetConnectionString("DefaultConnection");
             _cmd = cmd;
@@ -20,14 +21,14 @@ namespace movie.Services.BannerService.MovieService
         {
             ResponseModel<object> response = new ResponseModel<object>();
             DataTable dt = new DataTable();
-                using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                if (connection.State == ConnectionState.Open)
                 {
-                    if (connection.State == ConnectionState.Open)
-                    {
-                        await connection.CloseAsync();
-                    }
-                    await connection.OpenAsync();
-                    SqlTransaction tran = connection.BeginTransaction();
+                    await connection.CloseAsync();
+                }
+                await connection.OpenAsync();
+                SqlTransaction tran = connection.BeginTransaction();
                 try
                 {
                     string storedName = "manage_movie";
@@ -49,7 +50,7 @@ namespace movie.Services.BannerService.MovieService
                     }
                     else
                     {
-                        int _id = Int32.Parse(dt.Rows[0]["V_COLUMN"].ToString());
+                        int _id = int.Parse(dt.Rows[0]["V_COLUMN"].ToString());
 
                         foreach (ReleaseMovie release in model.releaseMovies)
                         {
@@ -68,7 +69,7 @@ namespace movie.Services.BannerService.MovieService
                             }
                             else
                             {
-                                int id = Int32.Parse(dt.Rows[0]["V_COLUMN"].ToString());
+                                int id = int.Parse(dt.Rows[0]["V_COLUMN"].ToString());
                                 foreach (ReleaseTime time in release.releaseTimes)
                                 {
                                     storedName = "manage_releaseTime";
@@ -84,11 +85,12 @@ namespace movie.Services.BannerService.MovieService
                                         throw new Exception("can't create movie");
                                     }
                                 }
-                                tran.Commit();
+
                             }
                         }
 
                     }
+                    tran.Commit();
                     response = new ResponseModel<object>()
                     {
                         success = true,
@@ -105,8 +107,8 @@ namespace movie.Services.BannerService.MovieService
                 {
                     await connection.CloseAsync();
                 }
-                    return response;
-                }
+                return response;
+            }
         }
 
         public async Task<ResponseModel<object>> deleteMovie(int id)
@@ -146,9 +148,39 @@ namespace movie.Services.BannerService.MovieService
             }
         }
 
-        public Task<ResponseModel<List<Movies>>> getAllMovie()
+        public async Task<ResponseModel<List<Movies>>> getAllMovie()
         {
-            throw new NotImplementedException();
+            ResponseModel<List<Movies>> response = new ResponseModel<List<Movies>>();
+            try
+            {
+                const string sql = "SELECT * FROM movie";
+                DataTable dt = await _cmd.SqlExecute(sql, null);
+                if (dt.Rows.Count > 0)
+                {
+                    List<Movies>? result = JsonConvert.DeserializeObject<List<Movies>>(JsonConvert.SerializeObject(dt));
+                    response = new ResponseModel<List<Movies>>()
+                    {
+                        success = true,
+                        data = result,
+                        message = "successfully"
+                    };
+                }
+                else
+                {
+                    response = new ResponseModel<List<Movies>>()
+                    {
+                        success = false,
+                        data = new List<Movies>(),
+                        message = "banner not found"
+                    };
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            return response;
         }
 
         public Task<ResponseModel<Movies>> getMovie(int id)
@@ -188,7 +220,7 @@ namespace movie.Services.BannerService.MovieService
                     }
                     else
                     {
-                        int _id = Int32.Parse(dt.Rows[0]["V_COLUMN"].ToString());
+                        int _id = int.Parse(dt.Rows[0]["V_COLUMN"].ToString());
                         string sql = "DELETE FROM releaseTime WHERE releaseId = @releaseId";
                         parameters = new SqlParameter[]
                         {
@@ -221,7 +253,7 @@ namespace movie.Services.BannerService.MovieService
                                 }
                                 else
                                 {
-                                    int xid = Int32.Parse(dt.Rows[0]["V_COLUMN"].ToString());
+                                    int xid = int.Parse(dt.Rows[0]["V_COLUMN"].ToString());
                                     foreach (ReleaseTime time in release.releaseTimes)
                                     {
                                         storedName = "manage_releaseTime";

@@ -1,6 +1,6 @@
 ﻿using movie.Models;
 
-namespace movie.Services.BannerService.MovieService
+namespace movie.Services.MovieService
 {
     public interface IMovieService
     {

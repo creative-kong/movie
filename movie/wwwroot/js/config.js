@@ -35,6 +35,9 @@ const movie_release_time_5 = document.getElementById('movie_release_time_5')
 const movie_release_time_6 = document.getElementById('movie_release_time_6')
 const movie_release_time_7 = document.getElementById('movie_release_time_7')
 const movie_release_time_8 = document.getElementById('movie_release_time_8')
+const message_movie = document.getElementById('message_movie')
+const movie_form = document.getElementById('movie_form')
+const movie_table_body = document.getElementById('movie_table_body')
 
 loadBanner()
 
@@ -475,7 +478,7 @@ async function configMovie () {
             const result = await response.json()
             console.log(result)
             if (result.success) {
-                
+                messageMovieModalSuccess(result.message)
             } else {
                 
             }
@@ -485,5 +488,120 @@ async function configMovie () {
         }
     } else {
 
+    }
+}
+
+function messageMovieModalSuccess(message) {
+    message_movie.textContent = ''
+    message_movie.classList.remove('hidden')
+    message_movie.classList.add('bg-green-400', 'px-2', 'py-3', 'rounded-md', 'my-4')
+    const spanIcon = document.createElement('span')
+    const pTag = document.createElement('p')
+    spanIcon.className = "material-symbols-outlined text-gray-800"
+    spanIcon.textContent = "check"
+    pTag.textContent = message
+    pTag.className = "font-normal"
+    message_movie.append(spanIcon)
+    message_movie.append(pTag)
+    movie_form.reset()
+    setTimeout(() => {
+        show_modal_movie.classList.add('hidden')
+        show_modal_movie.classList.remove('opacity-1')
+    }, 2000)
+    loadMovie()
+}
+
+loadMovie()
+ async function loadMovie() {
+    try {
+        const request = new Request('/movie')
+        const response = await fetch(request, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+        if (!response.ok) {
+            console.log('error')
+        }
+        const result = await response.json()
+        console.log(result)
+        if (result.success) {
+            createMovieTable(result.data)
+        } else {
+            movie_table_body.textContent = ''
+        }
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+function createMovieTable(data) {
+    movie_table_body.textContent = ''
+    data.forEach(d => {
+        trTag = document.createElement('tr')
+        thTag1 = document.createElement('th')
+        thTag2 = document.createElement('th')
+        thTag3 = document.createElement('th')
+        thTag4 = document.createElement('th')
+        thTag5 = document.createElement('th')
+        editBtn = document.createElement('button')
+        deleteBtn = document.createElement('button')
+        thTag1.textContent = d.title
+        thTag1.className = 'text-white border border-gray-200'
+        thTag2.textContent = d.released
+        thTag2.className = 'text-white border border-gray-200'
+        thTag3.textContent = d.runtime
+        thTag3.className = 'text-white border border-gray-200'
+        thTag4.textContent = d.genre
+        thTag4.className = 'text-white border border-gray-200'
+        thTag5.className = 'text-white border border-gray-200 gap-2'
+        editBtn.textContent = 'Edit'
+        editBtn.className = 'bg-white py-2 px-1 rounded-md text-gray-800 mx-2 font-normal'
+        editBtn.addEventListener('click', editMovie.bind(null, d.movieId))
+        deleteBtn.textContent = 'Delete'
+        deleteBtn.className = 'bg-white py-2 px-1 rounded-md text-gray-800 mx-2 font-normal'
+        deleteBtn.addEventListener('click', deleteMovie.bind(null, d.movieId))
+        thTag5.append(editBtn)
+        thTag5.append(deleteBtn)
+        trTag.append(thTag1)
+        trTag.append(thTag2)
+        trTag.append(thTag3)
+        trTag.append(thTag4)
+        trTag.append(thTag5)
+        movie_table_body.append(trTag)
+    })
+}
+
+function editMovie(id) {
+    
+}
+
+function deleteMovie(id) {
+    deleteMovieById(id)
+}
+
+async function deleteMovieById(id) {
+    try {
+        const request = new Request(`/movie/${id}`)
+        const response = await fetch(request, {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+        if (!response.ok) {
+            throw new Error()
+        }
+        const result = await response.json()
+        console.log(result)
+        if (result.success) {
+            console.log('success')
+            loadMovie()
+        }
+    } catch (err) {
+        //messageBannerModalError(`can't load movie with id : ${id}`)
     }
 }
