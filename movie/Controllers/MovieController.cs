@@ -40,12 +40,34 @@ namespace movie.Controllers
         }
 
         [HttpGet("/movie")]
-        public async Task<IActionResult> getAllBanner()
+        public async Task<IActionResult> getAllMovie()
         {
             var response = StatusCode(StatusCodes.Status200OK, new object());
             try
             {
                 ResponseModel<List<Movies>> result = await _movie.getAllMovie();
+                response = StatusCode(StatusCodes.Status200OK, result);
+            }
+            catch (Exception ex)
+            {
+                response = StatusCode(StatusCodes.Status500InternalServerError, new ResponseModel<object>()
+                {
+                    success = false,
+                    data = new object(),
+                    message = ex.Message
+                });
+            }
+
+            return response;
+        }
+
+        [HttpGet("/movie/{id}")]
+        public async Task<IActionResult> getMovie(int id)
+        {
+            var response = StatusCode(StatusCodes.Status200OK, new object());
+            try
+            {
+                ResponseModel<Movies> result = await _movie.getMovie(id);
                 response = StatusCode(StatusCodes.Status200OK, result);
             }
             catch (Exception ex)

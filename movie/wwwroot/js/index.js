@@ -35,6 +35,7 @@ function createMovie(data) {
         const p2Tag = document.createElement('p')
         const p3Tag = document.createElement('p')
         const p4Tag = document.createElement('p')
+        const button = document.createElement('a')
         divTag.className = 'flex flex-row gap-4'
         imgTag.src = d.poster
         imgTag.className = 'w-[180px] h-[250px]'
@@ -49,11 +50,15 @@ function createMovie(data) {
         p3Tag.className = 'text-white'
         p4Tag.textContent = 'Genres : ' + d.genre
         p4Tag.className = 'text-white'
+        button.textContent = 'booking'
+        button.className = 'py-2 px-2 border border-gray-200 rounded-md text-gray-200 my-6 text-center'
+        button.href = `/home/booking?movieId=${d.movieId}`
         divContent.append(h1Tag)
         divContent.append(p1Tag)
         divContent.append(p2Tag)
         divContent.append(p3Tag)
         divContent.append(p4Tag)
+        divContent.append(button)
         divTag.append(imgTag)
         divTag.append(divContent)
         release_movie.append(divTag)

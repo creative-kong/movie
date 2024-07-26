@@ -1,0 +1,46 @@
+﻿@{
+    ViewData["Title"] = "booking";
+}
+
+<div class="w-[80%] mx-auto my-8 flex flex-row gap-6" id="movie_content">
+    <div class="w-[30%]" id="movie_poster">
+
+    </div>
+</div>
+
+<!--Booking Model-->
+<div class="fixed left-0 top-0 flex hidden h-full w-full items-center justify-center bg-opacity-50" id="show_modal_booking">
+    <div class="w-[40%] relative flex flex-col rounded-md bg-white px-8 pb-8 pt-14 shadow-md">
+        <span class="material-symbols-outlined absolute right-5 top-5 cursor-pointer text-gray-800" id="close_booking_modal">
+            close
+        </span>
+        <form class="flex flex-col" id="booking_form">
+            <div class="my-4">
+                <p id="movie_booking_id" class="my-2 hidden"></p>
+                <p id="movie_booking_title" class="my-2">Title : </p>
+                <p id="movie_booking_date_id" class="my-2 hidden"></p>
+                <p id="movie_booking_date" class="my-2">Date : </p>
+                <p id="movie_booking_time" class="my-2">Time : </p>
+            </div>
+            <div class="my-2 flex w-full flex-col">
+                <label for="customer_booking_name">name</label>
+                <input type="text" id="customer_booking_name" required class="w-full rounded-md border border-gray-300 px-2 py-2 focus:outline-none active:outline-none" />
+            </div>
+            <div class="mb-6 flex w-full flex-col">
+                <label for="customer_booking_tel">phone</label>
+                <input type="tel" id="customer_booking_tel" required class="w-full rounded-md border border-gray-300 px-2 py-2 focus:outline-none active:outline-none" />
+            </div>
+            <div class="flex hidden w-full gap-3" id="message_booking">
+            </div>
+            <div class="flex w-full gap-4">
+                <button type="reset" class="w-[50%] rounded-md bg-gray-800 px-2 py-2 text-white" id="cancle_booking_btn">Cancle</button>
+                <button type="submit" class="w-[50%] rounded-md bg-gray-800 px-2 py-2 text-white" id="booking_submit_btn">Booking</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="/js/booking.js"></script>
+}

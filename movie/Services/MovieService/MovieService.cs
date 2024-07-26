@@ -183,9 +183,62 @@ namespace movie.Services.MovieService
             return response;
         }
 
-        public Task<ResponseModel<Movies>> getMovie(int id)
+        public async Task<ResponseModel<Movies>> getMovie(int id)
         {
-            throw new NotImplementedException();
+            ResponseModel<Movies> response = new ResponseModel<Movies>();
+            try
+            {
+                const string sql = "SELECT * FROM movie WHERE movieId = @movieId";
+                SqlParameter[] parameters = new SqlParameter[]
+                {
+                    new SqlParameter () { ParameterName = "@movieId", SqlDbType = SqlDbType.Int, Value = id }
+                };
+                DataTable dt = await _cmd.SqlExecute(sql, parameters);
+                const string sqlRelease = "SELECT * FROM releaseMovie WHERE movieId = @movieId";
+                SqlParameter[] parameters1 = new SqlParameter[]
+                {
+                    new SqlParameter () { ParameterName = "@movieId", SqlDbType = SqlDbType.Int, Value = id }
+                };
+                DataTable dtRelease = await _cmd.SqlExecute(sqlRelease, parameters1);
+                const string sqlReleaseTime = "SELECT * FROM releaseTime WHERE releaseId IN (SELECT releaseId FROM releaseMovie WHERE movieId = @movieId)";
+                SqlParameter[] parameters2 = new SqlParameter[]
+                {
+                    new SqlParameter () { ParameterName = "@movieId", SqlDbType = SqlDbType.Int, Value = id }
+                };
+                DataTable dtReleaseTime = await _cmd.SqlExecute(sqlReleaseTime, parameters2);
+                if (dt.Rows.Count > 0)
+                {
+                    List<Movies>? result = JsonConvert.DeserializeObject<List<Movies>>(JsonConvert.SerializeObject(dt));
+                    List<ReleaseMovie>? resultRelease = JsonConvert.DeserializeObject<List<ReleaseMovie>>(JsonConvert.SerializeObject(dtRelease));
+                    List<ReleaseTime>? resultReleaseTime = JsonConvert.DeserializeObject<List<ReleaseTime>>(JsonConvert.SerializeObject(dtReleaseTime));
+                    foreach (var release in resultRelease)
+                    {
+                        release.releaseTimes = resultReleaseTime.Where(x => x.releaseId == release.releaseId).ToList();
+                    }
+                    result.FirstOrDefault().releaseMovies = resultRelease;
+                    response = new ResponseModel<Movies>()
+                    {
+                        success = true,
+                        data = result.FirstOrDefault(),
+                        message = "successfully"
+                    };
+                }
+                else
+                {
+                    response = new ResponseModel<Movies>()
+                    {
+                        success = false,
+                        data = new Movies (),
+                        message = "banner not found"
+                    };
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            return response;
         }
 
         public async Task<ResponseModel<object>> updateMovie(int id, Movies model)
