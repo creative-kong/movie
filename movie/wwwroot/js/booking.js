@@ -11,6 +11,10 @@ const movie_booking_time = document.getElementById('movie_booking_time')
 const booking_submit_btn = document.getElementById('booking_submit_btn')
 const customer_booking_name = document.getElementById('customer_booking_name')
 const customer_booking_tel = document.getElementById('customer_booking_tel')
+const message_booking = document.getElementById('message_booking')
+const booking_form = document.getElementById('booking_form')
+const close_booking_modal = document.getElementById('close_booking_modal')
+const cancle_booking_btn = document.getElementById('cancle_booking_btn')
 
 getMovie().then().catch(err => console.log(err))
 async function getMovie() {
@@ -100,30 +104,86 @@ function showBooking() {
     show_modal_booking.classList.add('opacity-1')
 }
 
+close_booking_modal.addEventListener('click', function () {
+    booking_form.reset()
+    show_modal_booking.classList.add('hidden')
+    show_modal_booking.classList.remove('opacity-1')
+})
+
+cancle_booking_btn.addEventListener('click', function () {
+    show_modal_booking.classList.add('hidden')
+    show_modal_booking.classList.remove('opacity-1')
+})
+
 booking_submit_btn.addEventListener('click', async function (e) {
     e.preventDefault()
-    let booking = {}
-    booking.movieId = movie_booking_id.innerHTML
-    booking.releaseId = movie_booking_date_id.innerHTML
-    booking.time = movie_booking_time.innerHTML.split('e')[1]
-    booking.customer_name = customer_booking_name.value
-    booking.customer_tel = customer_booking_tel.value
-    try {
-        const request = new Request('/booking')
-        const response = await fetch(request, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept' : 'application/json'
-            },
-            body: JSON.stringify(booking)
-        })
-        if (!response.ok) {
-            throw new Error(`can't create booking'`)
+    if (customer_booking_name.value != '' || customer_booking_tel.value != '') {
+        let booking = {}
+        booking.movieId = movie_booking_id.innerHTML
+        booking.releaseId = movie_booking_date_id.innerHTML
+        booking.time = movie_booking_time.innerHTML.split('e')[1]
+        booking.customer_name = customer_booking_name.value
+        booking.customer_tel = customer_booking_tel.value
+        try {
+            const request = new Request('/booking')
+            const response = await fetch(request, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(booking)
+            })
+            if (!response.ok) {
+                throw new Error(`can't create booking'`)
+            }
+            const result = await response.json()
+            if (result.success) {
+                booking_submit_btn.disabled = true
+                messageModalSuccess(result.message)
+            }
+            console.log(result)
+        } catch (err) {
+            console.log(err)
         }
-        const result = await response.json()
-        console.log(result)
-    } catch (err) {
-        console.log(err)
+    }
+    else {
+        messageModalWarning('name or tel is required')
     }
 })
+
+function messageModalSuccess(message) {
+    message_booking.textContent = ''
+    message_booking.classList.remove('hidden')
+    message_booking.classList.add('bg-green-400', 'px-2', 'py-3', 'rounded-md', 'my-4')
+    const spanIcon = document.createElement('span')
+    const pTag = document.createElement('p')
+    spanIcon.className = "material-symbols-outlined text-gray-800"
+    spanIcon.textContent = "check"
+    pTag.textContent = message + ' waiting redirect'
+    pTag.className = "font-normal"
+    message_booking.append(spanIcon)
+    message_booking.append(pTag)
+    booking_form.reset()
+    setTimeout(() => {
+        show_modal_banner.classList.add('hidden')
+        show_modal_banner.classList.remove('opacity-1')
+    }, 2000)
+    setTimeout(() => {
+        window.location.href = '/'
+    }, 2000)
+}
+
+function messageModalWarning(message) {
+    message_booking.textContent = ''
+    message_booking.classList.remove('hidden')
+    message_booking.classList.add('bg-yellow-400', 'px-2', 'py-3', 'rounded-md', 'my-4')
+    const spanIcon = document.createElement('span')
+    const pTag = document.createElement('p')
+    spanIcon.className = "material-symbols-outlined text-gray-800"
+    spanIcon.textContent = "warning"
+    pTag.textContent = message
+    pTag.className = "font-normal"
+    message_booking.append(spanIcon)
+    message_booking.append(pTag)
+}

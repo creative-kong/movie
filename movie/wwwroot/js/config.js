@@ -40,6 +40,7 @@ const movie_form = document.getElementById('movie_form')
 const movie_table_body = document.getElementById('movie_table_body')
 const movie_update_id = document.getElementById('movie_update_id')
 
+
 loadBanner()
 
 let banner_type = 'create'
@@ -47,12 +48,16 @@ let movie_type = 'create'
 
 add_banner.addEventListener('click', function () {
     banner_type = 'create'
+    banner_form.reset()
+    preview.classList.add('hidden')
     show_modal_banner.classList.remove('hidden')
     show_modal_banner.classList.add('opacity-1')
 })
 
 add_movie.addEventListener('click', function () {
     movie_type = 'create'
+    movie_form.reset()
+    preview_poster.classList.add('hidden')
     show_modal_movie.classList.remove('hidden')
     show_modal_movie.classList.add('opacity-1')
 })
@@ -295,7 +300,9 @@ function createBannerTable(data) {
 }
 
 function deleteBanner(id) {
-    deleteBannerById(id)
+    if (confirm('Sure To Delete')) {
+        deleteBannerById(id)
+    }
 }
 
 function editBanner(id) {
@@ -527,13 +534,13 @@ async function configMovie () {
             ]
             let releaseDate = [
                 {
-                    releaseId: 0,
+                    releaseId: document.getElementById(`movie_release_id_1`).innerHTML,
                     movieId: 0,
                     date: new Date(movie_release_1.value).toISOString(),
                     releaseTimes: releaseTime1
                 },
                 {
-                    releaseId: 0,
+                    releaseId: document.getElementById(`movie_release_id_2`).innerHTML,
                     movieId: 0,
                     date: new Date(movie_release_2.value).toISOString(),
                     releaseTimes: releaseTime2
@@ -671,7 +678,9 @@ function editMovie(id) {
 }
 
 function deleteMovie(id) {
-    deleteMovieById(id)
+    if (confirm('Sure To Delete')) {
+        deleteMovieById(id)
+    }
 }
 
 async function deleteMovieById(id) {
@@ -732,6 +741,7 @@ function appendMovie(data) {
     movie_genre.value = data.genre
     for (let i = 0; i < data.releaseMovies.length; i++) {
         document.getElementById(`movie_release_${i + 1}`).value = new Date(data.releaseMovies[i].date).toISOString().split('T')[0]
+        document.getElementById(`movie_release_id_${i + 1}`).innerHTML = data.releaseMovies[i].releaseId
         if (i == 0) {
             for (let j = 0; j < data.releaseMovies[i].releaseTimes.length; j++) {
                 document.getElementById(`movie_release_time_${j + 1}`).value = data.releaseMovies[i].releaseTimes[j].time
