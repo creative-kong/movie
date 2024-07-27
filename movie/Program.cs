@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.FileProviders;
 using movie.Services.BannerService;
+using movie.Services.BookingService;
 using movie.Services.CommandService;
 using movie.Services.MovieService;
 using System.Buffers;
@@ -15,6 +16,7 @@ builder.Services.AddRouting(options => options.LowercaseUrls = true);
 builder.Services.AddTransient<ICommandService, CommandService>();
 builder.Services.AddTransient<IBannerService, BannerService>();
 builder.Services.AddTransient<IMovieService, MovieService>();
+builder.Services.AddTransient<IBookingService, BookingService>();
 builder.Services.AddControllers(o =>
 {
     o.AllowEmptyInputInBodyModelBinding = true;

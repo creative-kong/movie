@@ -5,8 +5,12 @@ const show_modal_booking = document.getElementById('show_modal_booking')
 const movie_booking_id = document.getElementById('movie_booking_id')
 const movie_booking_title = document.getElementById('movie_booking_title')
 const movie_booking_date_id = document.getElementById('movie_booking_date_id')
+const movie_booking_title_id = document.getElementById('movie_booking_title_id')
 const movie_booking_date = document.getElementById('movie_booking_date')
 const movie_booking_time = document.getElementById('movie_booking_time')
+const booking_submit_btn = document.getElementById('booking_submit_btn')
+const customer_booking_name = document.getElementById('customer_booking_name')
+const customer_booking_tel = document.getElementById('customer_booking_tel')
 
 getMovie().then().catch(err => console.log(err))
 async function getMovie() {
@@ -95,3 +99,31 @@ function showBooking() {
     show_modal_booking.classList.remove('hidden')
     show_modal_booking.classList.add('opacity-1')
 }
+
+booking_submit_btn.addEventListener('click', async function (e) {
+    e.preventDefault()
+    let booking = {}
+    booking.movieId = movie_booking_id.innerHTML
+    booking.releaseId = movie_booking_date_id.innerHTML
+    booking.time = movie_booking_time.innerHTML.split('e')[1]
+    booking.customer_name = customer_booking_name.value
+    booking.customer_tel = customer_booking_tel.value
+    try {
+        const request = new Request('/booking')
+        const response = await fetch(request, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept' : 'application/json'
+            },
+            body: JSON.stringify(booking)
+        })
+        if (!response.ok) {
+            throw new Error(`can't create booking'`)
+        }
+        const result = await response.json()
+        console.log(result)
+    } catch (err) {
+        console.log(err)
+    }
+})

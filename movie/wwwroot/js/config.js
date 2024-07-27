@@ -664,6 +664,7 @@ function createMovieTable(data) {
 function editMovie(id) {
     console.log('update')
     movie_type = 'update'
+    message_movie.textContent = ''
     show_modal_movie.classList.remove('hidden')
     show_modal_movie.classList.add('opacity-1')
     getMovie(id).then().catch(err => console.log(err))
