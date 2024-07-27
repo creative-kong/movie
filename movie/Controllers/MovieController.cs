@@ -103,5 +103,28 @@ namespace movie.Controllers
             }
             return response;
         }
+
+        [HttpPut("/movie/{id}")]
+        [Consumes("application/json")]
+        public async Task<IActionResult> updateMovie(int id, [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] Movies model)
+        {
+            var response = StatusCode(StatusCodes.Status200OK, new object());
+            try
+            {
+                ResponseModel<object> result = await _movie.updateMovie(id, model);
+                response = StatusCode(StatusCodes.Status200OK, result);
+            }
+            catch (Exception ex)
+            {
+                response = StatusCode(StatusCodes.Status500InternalServerError, new ResponseModel<object>()
+                {
+                    success = false,
+                    data = new object(),
+                    message = ex.Message
+                });
+            }
+
+            return response;
+        }
     }
 }

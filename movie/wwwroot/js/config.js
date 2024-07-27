@@ -31,13 +31,14 @@ const movie_release_time_2 = document.getElementById('movie_release_time_2')
 const movie_release_time_3 = document.getElementById('movie_release_time_3')
 const movie_release_time_4 = document.getElementById('movie_release_time_4')
 const movie_release_2 = document.getElementById('movie_release_2')
-const movie_release_time_5 = document.getElementById('movie_release_time_5')
-const movie_release_time_6 = document.getElementById('movie_release_time_6')
-const movie_release_time_7 = document.getElementById('movie_release_time_7')
-const movie_release_time_8 = document.getElementById('movie_release_time_8')
+const movie_release_time_5 = document.getElementById('movie_release_times_1')
+const movie_release_time_6 = document.getElementById('movie_release_times_2')
+const movie_release_time_7 = document.getElementById('movie_release_times_3')
+const movie_release_time_8 = document.getElementById('movie_release_times_4')
 const message_movie = document.getElementById('message_movie')
 const movie_form = document.getElementById('movie_form')
 const movie_table_body = document.getElementById('movie_table_body')
+const movie_update_id = document.getElementById('movie_update_id')
 
 loadBanner()
 
@@ -487,7 +488,93 @@ async function configMovie () {
             messageBannerModalError('error to create banner')
         }
     } else {
+        try {
+            let releaseTime1 = [
+                {
+                    releaseId: 0,
+                    time: movie_release_time_1.value ,
+                },
+                {
+                    releaseId: 0,
+                    time: movie_release_time_2.value ,
+                },
+                {
+                    releaseId: 0,
+                    time: movie_release_time_3.value ,
+                },
+                {
+                    releaseId: 0,
+                    time: movie_release_time_4.value ,
+                }
+            ]
+            let releaseTime2 = [
+                {
+                    releaseId: 0,
+                    time: movie_release_time_5.value,
+                },
+                {
+                    releaseId: 0,
+                    time: movie_release_time_6.value ,
+                },
+                {
+                    releaseId: 0,
+                    time: movie_release_time_7.value ,
+                },
+                {
+                    releaseId: 0,
+                    time: movie_release_time_8.value,
+                }
+            ]
+            let releaseDate = [
+                {
+                    releaseId: 0,
+                    movieId: 0,
+                    date: new Date(movie_release_1.value).toISOString(),
+                    releaseTimes: releaseTime1
+                },
+                {
+                    releaseId: 0,
+                    movieId: 0,
+                    date: new Date(movie_release_2.value).toISOString(),
+                    releaseTimes: releaseTime2
+                },
+            ]
+            let movie = {}
+            movie.movieId = 0
+            movie.poster = preview_poster.src
+            movie.title = movie_title.value
+            movie.year = Number(movie_year.value)
+            movie.released = new Date(movie_released.value).toISOString()
+            movie.runtime = movie_runtime.value
+            movie.genre = movie_genre.value
+            movie.releaseMovies = releaseDate
 
+            console.log(JSON.stringify(movie))
+            const movieId = movie_update_id.innerHTML
+            const request = new Request(`/movie/${movieId}`)
+            const response = await fetch(request, {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(movie)
+            })
+            if (!response.ok) {
+                throw new Error()
+            }
+            console.log(response)
+            const result = await response.json()
+            console.log(result)
+            if (result.success) {
+                messageMovieModalSuccess(result.message)
+            } else {
+
+            }
+        } catch (err) {
+            console.log(err)
+            messageBannerModalError('error to create banner')
+        }
     }
 }
 
@@ -575,7 +662,11 @@ function createMovieTable(data) {
 }
 
 function editMovie(id) {
-    
+    console.log('update')
+    movie_type = 'update'
+    show_modal_movie.classList.remove('hidden')
+    show_modal_movie.classList.add('opacity-1')
+    getMovie(id).then().catch(err => console.log(err))
 }
 
 function deleteMovie(id) {
@@ -603,5 +694,51 @@ async function deleteMovieById(id) {
         }
     } catch (err) {
         //messageBannerModalError(`can't load movie with id : ${id}`)
+    }
+}
+
+async function getMovie(movieId) {
+    try {
+        const request = new Request(`/movie/${movieId}`)
+        const response = await fetch(request, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        })
+        if (!response.ok) {
+            throw new Error(`can't load movie'`)
+        }
+        const result = await response.json()
+        console.log(result)
+        if (result.success) {
+            appendMovie(result.data)
+        }
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+function appendMovie(data) {
+    movie_update_id.innerHTML = data.movieId
+    preview_poster.src = data.poster
+    preview_poster.classList.remove('hidden')
+    movie_title.value = data.title
+    movie_year.value = data.year
+    movie_released.value = new Date(data.released).toISOString().split('T')[0]
+    movie_runtime.value = data.runtime
+    movie_genre.value = data.genre
+    for (let i = 0; i < data.releaseMovies.length; i++) {
+        document.getElementById(`movie_release_${i + 1}`).value = new Date(data.releaseMovies[i].date).toISOString().split('T')[0]
+        if (i == 0) {
+            for (let j = 0; j < data.releaseMovies[i].releaseTimes.length; j++) {
+                document.getElementById(`movie_release_time_${j + 1}`).value = data.releaseMovies[i].releaseTimes[j].time
+            }
+        } else {
+            for (let j = 0; j < data.releaseMovies[i].releaseTimes.length; j++) {
+                document.getElementById(`movie_release_times_${j + 1}`).value = data.releaseMovies[i].releaseTimes[j].time
+            }
+        }
     }
 }

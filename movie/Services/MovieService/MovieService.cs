@@ -253,6 +253,7 @@ namespace movie.Services.MovieService
                     {
                         await connection.CloseAsync();
                     }
+                    await connection.OpenAsync();
                     SqlTransaction tran = connection.BeginTransaction();
                     string storedName = "manage_movie";
                     SqlParameter[] parameters = new SqlParameter[]
@@ -262,7 +263,7 @@ namespace movie.Services.MovieService
                         new SqlParameter () { ParameterName = "@title", SqlDbType = SqlDbType.NVarChar, Value = model.title },
                         new SqlParameter () { ParameterName = "@year", SqlDbType = SqlDbType.Int, Value = model.year },
                         new SqlParameter () { ParameterName = "@released", SqlDbType = SqlDbType.DateTime, Value = model.released },
-                        new SqlParameter () { ParameterName = "@runtime", SqlDbType = SqlDbType.Time, Value = model.runtime },
+                        new SqlParameter () { ParameterName = "@runtime", SqlDbType = SqlDbType.Time, Value = model.runtime.ToString() },
                         new SqlParameter () { ParameterName = "@genre", SqlDbType = SqlDbType.NVarChar, Value = model.genre }
                     };
                     dt = await _cmd.StoredExecuteTran(storedName, connection, tran, parameters);
@@ -313,7 +314,7 @@ namespace movie.Services.MovieService
                                         parameters = new SqlParameter[]
                                         {
                                         new SqlParameter () { ParameterName = "@releaseId", SqlDbType = SqlDbType.Int, Value = id },
-                                        new SqlParameter () { ParameterName = "@time", SqlDbType = SqlDbType.Time, Value = time.time }
+                                        new SqlParameter () { ParameterName = "@time", SqlDbType = SqlDbType.Time, Value = time.time.ToString() }
                                         };
                                         dt = await _cmd.StoredExecuteTran(storedName, connection, tran, parameters);
                                         if (dt.Rows[0]["V_COLUMN"].ToString() == "-1")
@@ -322,11 +323,11 @@ namespace movie.Services.MovieService
                                             throw new Exception("can't create movie");
                                         }
                                     }
-                                    tran.Commit();
                                 }
                             }
                         }
                     }
+                    tran.Commit();
                     response = new ResponseModel<object>()
                     {
                         success = true,
