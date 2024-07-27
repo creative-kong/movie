@@ -52,6 +52,8 @@ add_banner.addEventListener('click', function () {
     preview.classList.add('hidden')
     show_modal_banner.classList.remove('hidden')
     show_modal_banner.classList.add('opacity-1')
+    message_banner.classList.add('hidden')
+    message_banner.innerHTML = ''
 })
 
 add_movie.addEventListener('click', function () {
@@ -60,16 +62,22 @@ add_movie.addEventListener('click', function () {
     preview_poster.classList.add('hidden')
     show_modal_movie.classList.remove('hidden')
     show_modal_movie.classList.add('opacity-1')
+    message_movie.textContent = ''
+    message_movie.classList.add('hidden')
 })
 
 close_banner_modal.addEventListener('click', function () {
     show_modal_banner.classList.add('hidden')
     show_modal_banner.classList.remove('opacity-1')
+    message_banner.classList.add('hidden')
+    message_banner.innerHTML = ''
 })
 
 close_modal_movie.addEventListener('click', function () {
     show_modal_movie.classList.add('hidden')
     show_modal_movie.classList.remove('opacity-1')
+    message_movie.textContent = ''
+    message_movie.classList.add('hidden')
 })
 
 cancle_banner_btn.addEventListener('click', function () {
@@ -93,7 +101,6 @@ banner_submit_btn.addEventListener('click', function (e) {
     console.log(preview.src)
     console.log(Boolean(select_banner_option.value))
     configBanner()
-    message_banner.classList.add('hidden')
 })
 
 async function uploadFile(file) {
@@ -116,68 +123,74 @@ async function uploadFile(file) {
 } 
 
 async function configBanner() {
-    if (banner_type === 'create') {
-        const request = new Request('/banner')
-        try {
-            let banner = {}
-            banner.bannerId = 0
-            banner.bannerUrl = preview.src
-            banner.isActive = select_banner_option.value.toLowerCase() === 'true'
-            const response = await fetch(request, {
-                method: 'POST',
-                headers: {
-                    'Accept' : 'application/json',
-                    'Content-Type' : 'application/json'
-                },
-                body: JSON.stringify(banner)
-            })
-            if (!response.ok) {
-                throw new Error()
+    console.log(preview.src, select_banner_option.value)
+    if (preview.src != '' && select_banner_option.value != '0') {
+        if (banner_type === 'create') {
+            const request = new Request('/banner')
+            try {
+                let banner = {}
+                banner.bannerId = 0
+                banner.bannerUrl = preview.src
+                banner.isActive = select_banner_option.value.toLowerCase() === 'true'
+                const response = await fetch(request, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(banner)
+                })
+                if (!response.ok) {
+                    throw new Error()
+                }
+                console.log(response)
+                const result = await response.json()
+                console.log(result)
+                if (result.success) {
+                    messageBannerModalSuccess(result.message)
+                } else {
+                    messageBannerModalWarning(result.message)
+                }
+            } catch (err) {
+                console.log(err)
+                messageBannerModalError('error to create banner')
             }
-            console.log(response)
-            const result = await response.json()
-            console.log(result)
-            if (result.success) {
-                messageBannerModalSuccess(result.message)
-            } else {
-                messageBannerModalWarning(result.message)
+        } else {
+            const bannerId = banner_id.innerHTML
+            try {
+                const request = new Request(`/banner/${bannerId}`)
+                let banner = {}
+                banner.bannerId = bannerId
+                banner.bannerUrl = preview.src
+                banner.isActive = select_banner_option.value.toLowerCase() === 'true'
+                const response = await fetch(request, {
+                    method: 'PUT',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(banner)
+                })
+                if (!response.ok) {
+                    throw new Error()
+                }
+                console.log(response)
+                const result = await response.json()
+                console.log(result)
+                if (result.success) {
+                    messageBannerModalSuccess(result.message)
+                } else {
+                    messageBannerModalWarning(result.message)
+                }
+            } catch (err) {
+                console.log(err)
+                messageBannerModalError('error to create banner')
             }
-        } catch (err) {
-            console.log(err)
-            messageBannerModalError('error to create banner')
         }
     } else {
-        const bannerId = banner_id.innerHTML
-        try {
-            const request = new Request(`/banner/${bannerId}`)
-            let banner = {}
-            banner.bannerId = bannerId
-            banner.bannerUrl = preview.src
-            banner.isActive = select_banner_option.value.toLowerCase() === 'true'
-            const response = await fetch(request, {
-                method: 'PUT',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(banner)
-            })
-            if (!response.ok) {
-                throw new Error()
-            }
-            console.log(response)
-            const result = await response.json()
-            console.log(result)
-            if (result.success) {
-                messageBannerModalSuccess(result.message)
-            } else {
-                messageBannerModalWarning(result.message)
-            }
-        } catch (err) {
-            console.log(err)
-            messageBannerModalError('error to create banner')
-        }
+        messageBannerModalWarning('img and isActive is required')
     }
+    
 }
 
 async function loadBanner() {
@@ -492,7 +505,7 @@ async function configMovie () {
             }
         } catch (err) {
             console.log(err)
-            messageBannerModalError('error to create banner')
+            messageMovieModalError('error to create movie or all field is required')
         }
     } else {
         try {
@@ -603,6 +616,20 @@ function messageMovieModalSuccess(message) {
         show_modal_movie.classList.remove('opacity-1')
     }, 2000)
     loadMovie()
+}
+
+function messageMovieModalError(message) {
+    message_movie.textContent = ''
+    message_movie.classList.remove('hidden')
+    message_movie.classList.add('bg-red-400', 'px-2', 'py-3', 'rounded-md', 'my-4')
+    const spanIcon = document.createElement('span')
+    const pTag = document.createElement('p')
+    spanIcon.className = "material-symbols-outlined text-gray-800"
+    spanIcon.textContent = "error"
+    pTag.textContent = message
+    pTag.className = "font-normal"
+    message_movie.append(spanIcon)
+    message_movie.append(pTag)
 }
 
 loadMovie()
